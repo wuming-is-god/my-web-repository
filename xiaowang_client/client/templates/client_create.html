@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}客户信息填写{% endblock title %}
+
+{% block main %}
+    <div class="container d-flex justify-content-center flex-column align-items-center">
+        <!--错误提示区-->
+        <div class="w-100 mt-3" style="max-width:400px;">
+            {% if form.errors %}
+                <div class="alert alert-danger">    
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <!--表单区-->
+            <div">
+                <form action="{% url 'client:client_create' %}" method='post'>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-success w-100" type="submit">提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock main %}
+

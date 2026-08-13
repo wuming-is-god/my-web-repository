@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}客户信息列表{% endblock title %}
+
+{% block main %}
+    <div class="container d-flex justify-content-center flex-column align-items-center">
+        <!--搜索框和选择框-->
+        <dv class="mt-2">
+            <div class="d-flex gap-2">
+                <input class="form-control" type="text" id="input-search" placeholder="search">
+                <button class="btn btn-success" type="button" id="btn-search">搜索</button>
+            </div>
+            <div class="mt-2">
+                <select class="form-select" name="source" id="select">
+                    <option value="">请选择</option>
+                    <option value="web">官网</option>
+                    <option value="referral">转介绍</option>
+                    <option value="cold_call">电话膜拜</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <!--搜索信息显示区-->
+        <div>
+            <ul class="list-group" id="ul-list">
+            </ul>
+        </div>
+        <hr>
+        <!--信息日常显示区-->
+        <div>
+            <ul class="list-group"> 
+                {% for client in clients %}
+                    <li class="list-group-item">
+                        <a href="{% url 'client:client_update' pk=client.id %}" class="text-decoration-none">{{ client.name }} - {{ client.phone }}</a>
+                        <button class="btn btn-outline-danger btn-sm btn-delete" data-id="{{ client.id }}">删除</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--删除AJAX-->
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            // 1. 先判断 document.cookie 是否有内容
+            if (document.cookie && document.cookie !== '') {
+                // 2. 用分号分割成单个键值对数组
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    // 3. 去除每个键值对首尾可能存在的空格
+                    const cookie = cookies[i].trim();
+                    // 4. 检查当前键值对是否以 (name + '=') 开头
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        // 5. 取出值部分，并用 decodeURIComponent 解码（防止 URL 编码乱码）
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // 删除按钮点击事件（事件委托，适用于动态生成的按钮）
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('btn-delete')) return;
+
+            if (!confirm('确定要删除这条客户信息吗？')) return;
+
+            const pk = e.target.getAttribute('data-id');
+
+            fetch(`/client/delete/${pk}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.state === 'success') {
+                    e.target.closest('li').remove();
+                } else {
+                    alert('删除失败：' + (data.error || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('删除出错:', error);
+                alert('网络错误，请稍后重试');
+            });
+        });        
+    </script>
+    <!--搜索AJAX-->
+    <script>
+        let input_search = document.getElementById("input-search")
+        let btn_search = document.getElementById("btn-search")
+        let select = document.getElementById("select")
+
+        btn_search.addEventListener("click", search)
+        select.addEventListener("change", search)
+
+        function search(){
+            const phone = input_search.value.trim();
+            const source = select.value;
+            const list = document.querySelector("#ul-list")
+
+            if (!phone && !source) {
+                list.innerHTML= '';
+                alert('请输入搜索条件或选择来源');
+                return;
+            }
+
+            fetch(`/client/search/?phone=${encodeURIComponent(phone)}&source=${encodeURIComponent(source)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.state === 'success' && data.clients.length > 0) {
+                    list.innerHTML = '';
+                    data.clients.forEach(client => {
+                        const updateUrlBase = "{% url 'client:client_update' pk=0 %}".replace('0', '');
+                        list.innerHTML += `
+                            <li class="list-group-item">
+                                <a href="${updateUrlBase}${client.id}/" class="text-decoration-none">${client.name} - ${client.phone}</a>
+                                <button class="btn btn-outline-danger btn-sm btn-delete" data-id="${client.id}">删除</button>
+                            </li>`;
+                    });
+                } else {
+                    list.innerHTML = '<li class="list-group-item">无匹配结果</li>';
+                }
+            })
+            .catch(error => {
+                console.error('搜索出错:', error);
+                alert('搜索失败，请稍后重试');
+            });
+        }
+    </script>
+{% endblock main %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}注册{% endblock title %}
+
+{% block main %}
+    <div class="container d-flex justify-content-center flex-column align-items-center">
+        <div class="w-100 mt-3" style="max-width: 400px;">
+            <!--错误提示区-->
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <!--表单区-->
+            <form action="{% url 'client:register' %}" method='post'>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-success w-100" type="submit">注册</button>
+            </form>
+        </div>
+    </div>
+{% endblock main %}

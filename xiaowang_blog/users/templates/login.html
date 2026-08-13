@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block  title %}登录{% endblock  %}
+
+{% block body %}
+    <div class="container align-items-center">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="row">
+                <div class="col-auto">
+                    <h1>{{ form.non_field_errors }}</h1>
+                </div>
+            </div>
+        {% endif %}
+        <form action="{% url 'user:login' %}" method="post">
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">用户名:</label>
+                <input type="text" id="{{ form.username.id_for_label }}" 
+                class="form-control" placeholder="请输入用户名" 
+                aria-describedby="UsernameHelpBlock" 
+                name="{{ form.username.name }}">
+                <div class="form-text" id="UsernameHelpBlock">
+                    用户名填写提示
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">密码:</label>
+                <input type="password" id="{{ form.password.id_for_label }}" 
+                class="form-control" placeholder="请输入密码" 
+                aria-describedby="PasswordHelpBlock"
+                name="{{ form.password.name }}">
+                <div class="form-text" id="PasswordHelpBlock">
+                    密码填写提示
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="check1" value="">
+                <label for="check1" class="form-check-label">承诺书</label>
+            </div>
+            <div class="row mb-3">
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-success" 
+                        name="login" >登录</button>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-outline-success" 
+                    name="rigister" href="{% url 'user:register' %}" role="button">
+                        注册</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    
+
+{% endblock %}
