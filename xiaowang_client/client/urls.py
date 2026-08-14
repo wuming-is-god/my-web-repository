@@ -1,12 +1,14 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
+from .forms import ClientForm, CustomAuthenticationForm
 from . import views
 
 app_name = 'client'
 
 urlpatterns = [
     # 登录
-    path('login/', LoginView.as_view(template_name='login.html'), name='login'),
+    path('login/', LoginView.as_view(template_name='login.html', 
+        form_class=CustomAuthenticationForm,), name='login'),
     # 登出
     path('logout/', views.user_logout, name='logout'),
     # 注册

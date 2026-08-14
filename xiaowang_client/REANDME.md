@@ -54,7 +54,7 @@ python manage.py runserver
 └── static/ # 静态文件
 
 ## 在线演示
-[部署链接]（部署后补充）
+http://xiaowang.pythonanywhere.com（部署后补充）
 
 ## 作者
-[你的名字] - 2026年
+小王 - 2026年

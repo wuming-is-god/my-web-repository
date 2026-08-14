@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-7k0*jtj%*&cc(7hkfo$sewe5)e9^zt3=6m-u19+^*dknr@ar*k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['xiaowang.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition
@@ -116,6 +116,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+STATIC_ROOT = '/home/xiaowang/mysite/xiaowang_client/staticfiles'
 STATIC_URL = 'static/'
 
 # Default primary key field type
@@ -127,3 +128,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'client:login'
 # 内置LoginView的重定向界面
 LOGIN_REDIRECT_URL = 'client:client_create'
+from django.contrib.messages import constants as messages
+# 全局错误提示
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',   # Bootstrap 用 danger 而不是 error
+}

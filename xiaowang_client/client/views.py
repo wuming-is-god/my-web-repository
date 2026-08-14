@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin 
 from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from django.contrib.auth import login, logout
@@ -9,18 +8,19 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count, Avg, Q, F
 from .models import Client
-from .forms import ClientForm
+from .forms import ClientForm, CustomUserCreationForm
 from django.views.decorators.http import require_http_methods
+from django.contrib import messages
 
 def register(request):
     """注册"""
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
             login(request, new_user)
             return redirect(reverse('client:client_create'))
-    form = UserCreationForm()
+    form = CustomUserCreationForm()
     context = {'form':form}
     return render(request, 'register.html', context)
 
@@ -38,6 +38,8 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.owner = self.request.user
+        response = super().form_valid(form)
+        messages.success(self.request, '客户创建成功')
         return super().form_valid(form)
     
 class ClientListView(LoginRequiredMixin, ListView):
@@ -87,3 +89,8 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self):
         client = get_object_or_404(Client, owner=self.request.user, pk=self.kwargs.get('pk'))
         return client
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, '客户信息更新成功')
+        return response

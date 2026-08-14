@@ -2,6 +2,8 @@ from django import forms
 from .models import Client
 from django.core.exceptions import ValidationError
 import re
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -23,3 +25,32 @@ class ClientForm(forms.ModelForm):
         if re.match(pattern, phone):
             return phone
         raise ValidationError('请输入正确的11位手机号码')
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': '请输入用户名'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': '请输入密码'
+        })
+
+class CustomUserCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': '请输入用户名'
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': '请输入密码'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': '请确认密码'
+        })
